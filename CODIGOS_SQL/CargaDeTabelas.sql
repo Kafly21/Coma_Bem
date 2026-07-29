@@ -1,45 +1,34 @@
-USE DB_COMA_BEM;
+USE coma_bem;
 
-INSERT INTO TB_RESTAURANTES
-(
-  ID_RESTAURANTE
-, RES_NOME
-, RES_TIPO
-, RES_LONGITUDE
-, RES_LATITUDE
-, RES_RANKING
-)
-VALUES
-(1, 'Pizzaria Napoli', 'Italiana', '-46.6333', '-23.5505', 4.5),
-(2, 'Sushi House', 'Japonesa', '-46.6388', '-23.5489', 4.7),
-(3, 'Burger Kingo', 'Fast Food', '-46.6400', '-23.5510', 4.0),
-(4, 'Churrascaria Fogo Vivo', 'Churrascaria', '-46.6350', '-23.5520', 4.8),
-(5, 'Café Central', 'Cafeteria', '-46.6370', '-23.5490', 4.3);
+INSERT INTO usuario (usu_nm_usuario, usu_tx_email, usu_tx_senha) VALUES
+('Carlos Silva', 'carlos@email.com', 'senha123'),
+('Mariana Souza', 'mariana@email.com', 'senha456'),
+('João Pereira', 'joao@email.com', 'senha789'),
+('Fernanda Lima', 'fernanda@email.com', 'senha101'),
+('Rafael Costa', 'rafael@email.com', 'senha102');
 
+INSERT INTO restaurante (
+    res_nm_restaurante,
+    res_nu_latitude,
+    res_nu_longitude,
+    res_ds_tipo_culinaria
+) VALUES
+('Sushi House', '-23.550520', '-46.633308', 'Japonesa'),
+('Cantina Bella Itália', '-23.561684', '-46.655981', 'Italiana'),
+('Le Petit Bistrô', '-23.570123', '-46.641234', 'Francesa'),
+('Churrascaria Boi Bom', '-23.582345', '-46.671234', 'Brasileira'),
+('Taco Loco', '-23.590987', '-46.680123', 'Mexicana');
 
-INSERT INTO TB_AVALIACOES
-(
-  ID_AVALIACAO
-, RES_ID
-, RES_NOME
-, RES_TIPO
-, RES_RANKING
-, AV_PRATO
-, AV_PRATO_FOTO
-, AV_RANKING
-, AV_RECOMENDACAO
-)
-VALUES
-(1, 1, 'Pizzaria Napoli', 'Italiana', 4.5, 'Pizza Margherita', NULL, 4.8, 'Muito boa, massa leve'),
-(2, 2, 'Sushi House', 'Japonesa', 4.7, 'Rodízio Sushi', NULL, 4.9, 'Peixe fresco demais'),
-(3, 3, 'Burger Kingo', 'Fast Food', 4.0, 'X-Burgão', NULL, 4.2, 'Bom e barato'),
-(4, 4, 'Churrascaria Fogo Vivo', 'Churrascaria', 4.8, 'Picanha', NULL, 5.0, 'Carne perfeita'),
-(5, 5, 'Café Central', 'Cafeteria', 4.3, 'Cappuccino', NULL, 4.6, 'Ótimo pra relaxar');
+INSERT INTO prato (pra_nm_prato, pra_im_foto, pra_id_restaurante) VALUES
+('Combinado Salmão', 'img/salmao.jpg', 1),
+('Lasanha à Bolonhesa', 'img/lasanha.jpg', 2),
+('Filet Mignon au Poivre', 'img/filet.jpg', 3),
+('Picanha na Brasa', 'img/picanha.jpg', 4),
+('Nachos Supremos', 'img/nachos.jpg', 5);
 
-UPDATE TB_AVALIACOES
-SET AV_RANKING = 4.7,
-    AV_RECOMENDACAO = 'Melhorou muito, voltaria fácil'
-WHERE ID_AVALIACAO = 3;
-
-DELETE FROM TB_AVALIACOES
-WHERE ID_AVALIACAO = 2;
+INSERT INTO avaliacao (avl_nu_ranking, avl_tx_recomendacao, avl_id_prato, avl_id_usuario) VALUES
+(5, 'O peixe estava extremamente fresco, maravilhoso!', 1, 1),
+(4, 'Massa muito boa, mas o molho podia ter mais tempero.', 2, 2),
+(5, 'Carne no ponto perfeito, ambiente agradável.', 3, 3),
+(3, 'A picanha estava um pouco dura hoje.', 4, 4),
+(5, 'Melhor guacamole da cidade, muito bem servido!', 5, 5);
