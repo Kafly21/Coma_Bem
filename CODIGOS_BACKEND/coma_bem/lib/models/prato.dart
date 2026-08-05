@@ -1,8 +1,8 @@
 class Prato {
-  int _idPrato;
+  final int _idPrato;
   String _nomePrato;
   String? _foto;
-  int _idRestaurante;
+  final int _idRestaurante;
 
   Prato(this._idPrato, this._nomePrato, this._idRestaurante, [this._foto]);
 

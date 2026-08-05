@@ -1,7 +1,7 @@
 /// Classe que representa a tabela de Restaurantes.
 class Restaurante {
   // Atributos privados
-  int _idRestaurante;
+  final int _idRestaurante;
   String _nomeRestaurante;
   String _latitude;
   String _longitude;

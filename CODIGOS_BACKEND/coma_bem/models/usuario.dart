@@ -1,7 +1,7 @@
 /// Classe que representa a tabela de Usuários do banco de dados.
 class Usuario {
   // Atributos privados (encapsulamento utilizando o prefixo _)
-  int _idUsuario;
+  final int _idUsuario;
   String _nomeUsuario;
   String _email;
   String _senha;

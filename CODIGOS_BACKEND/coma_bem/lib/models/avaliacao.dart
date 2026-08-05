@@ -1,9 +1,9 @@
 class Avaliacao {
-  int _idAvaliacao;
+  final int _idAvaliacao;
   int _ranking;
   String _recomendacao;
-  int _idPrato;
-  int _idUsuario;
+  final int _idPrato;
+  final int _idUsuario;
 
   Avaliacao(
     this._idAvaliacao,

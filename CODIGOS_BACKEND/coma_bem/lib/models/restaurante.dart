@@ -1,5 +1,5 @@
 class Restaurante {
-  int _idRestaurante;
+  final int _idRestaurante;
   String _nomeRestaurante;
   String _latitude;
   String _longitude;

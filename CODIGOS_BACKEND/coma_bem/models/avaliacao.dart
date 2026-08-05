@@ -1,11 +1,11 @@
 /// Classe que une os dados do usuário e do prato avaliado.
 class Avaliacao {
   // Atributos privados
-  int _idAvaliacao;
+  final int _idAvaliacao;
   int _ranking; // Nota de 1 a 5
   String _recomendacao; // Texto da avaliação
-  int _idPrato; // FK
-  int _idUsuario; // FK
+  final int _idPrato; // FK
+  final int _idUsuario; // FK
 
   // Construtor
   Avaliacao(this._idAvaliacao, this._ranking, this._recomendacao,

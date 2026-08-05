@@ -1,10 +1,10 @@
 /// Classe que representa a tabela de Pratos, contendo a referência ao Restaurante.
 class Prato {
   // Atributos privados
-  int _idPrato;
+  final int _idPrato;
   String _nomePrato;
   String? _foto; // A interrogação significa que este campo pode ser nulo (NULL)
-  int _idRestaurante; // Representa a Chave Estrangeira (FK)
+  final int _idRestaurante; // Representa a Chave Estrangeira (FK)
 
   // Construtor
   Prato(this._idPrato, this._nomePrato, this._idRestaurante, [this._foto]);
