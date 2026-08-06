@@ -1,17 +1,51 @@
-# coma_bem
+# Aplicativo Coma Bem
 
-A new Flutter project.
+## Sobre o Projeto
+O **Coma Bem** é um aplicativo mobile desenvolvido para conectar amantes da culinária a bons restaurantes locais. Este projeto foi construído como
+parte da unidade curricular de Banco de Dados Mobile e foca na estruturação segura e eficiente de dados.
 
-## Getting Started
+## Tecnologias Utilizadas
+* **Linguagem:** Dart  
+* **Framework:** Flutter  
+* **Banco de Dados:** SQLite (sqflite)  
+* **Padrões de Projeto:** Orientação a Objetos, DAO (Data Access Object)
 
-This project is a starting point for a Flutter application.
+## Modelagem do Banco de Dados
+O banco de dados relacional foi construído respeitando as regras de normalização (1FN, 2FN e 3FN) para evitar redundância.
 
-A few resources to get you started if this is your first Flutter project:
+As tabelas principais do sistema são:
+1. **usuario** – Armazena os dados dos usuários (nome, email e senha)  
+2. **restaurante** – Contém informações dos restaurantes cadastrados  
+3. **prato** – Registra os pratos vinculados a cada restaurante  
+4. **avaliacao** – Guarda as avaliações feitas pelos usuários sobre os pratos  
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Arquitetura e Orientação a Objetos
+O sistema foi desenhado utilizando os pilares da Orientação a Objetos:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+**Encapsulamento:**  
+Todos os atributos das classes de modelo (como senha do usuário) são privados (`_`), sendo acessados apenas de forma segura através de `getters` e `setters` com validação de dados.
+
+* **Herança:**  
+Criação de perfis especializados (`Cliente`, `Administrador`, `DonoRestaurante`) que herdam características de uma classe base abstrata `Usuario`.
+
+**Polimorfismo:**  
+Implementação de menus e permissões dinâmicas. O método `exibirMenu()` adapta-se automaticamente dependendo de qual perfil de usuário está logado no sistema.
+
+## Transações e Regras de Negócio (CRUD)
+A classe `DatabaseHelper` centraliza a conexão com o banco de dados físico no dispositivo móvel. As rotinas implementadas possuem tratamento de erros (`try-catch`) e proteção contra injeção de SQL (`SQL Injection`).
+
+* **Create:** Cadastro de usuários (cliente e administrador), restaurantes, pratos e avaliações  
+* **Read:** Listagem de usuários, restaurantes, pratos e avaliações cadastradas  
+* **Update:** Atualização de dados do usuário (nome, email e senha) e avaliações  
+* **Delete:** Remoção de usuários, pratos ou avaliações do sistema  
+
+## Como Executar o Projeto
+1. Clone este repositório.
+2. Abra o projeto no VS Code.
+3. Certifique-se de ter um Emulador Android configurado.
+4. Execute o comando `flutter pub get` no terminal para baixar as dependências (`sqflite` e `path`).
+5. Pressione `F5` para compilar e testar o aplicativo no emulador.
+
+---
+
+*Desenvolvido por Kauan Dias*
