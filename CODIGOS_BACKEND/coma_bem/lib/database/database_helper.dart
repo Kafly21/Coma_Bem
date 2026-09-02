@@ -7,6 +7,8 @@ class DatabaseHelper {
   static final DatabaseHelper _instancia = DatabaseHelper._interno();
   static Database? _bancoDeDados;
 
+  static DatabaseHelper get instancia => _instancia;
+
   factory DatabaseHelper() => _instancia;
 
   DatabaseHelper._interno();
