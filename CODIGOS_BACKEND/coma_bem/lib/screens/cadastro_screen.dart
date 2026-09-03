@@ -1,6 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 import '../database/database_helper.dart';
 
@@ -12,190 +13,299 @@ class CadastroScreen extends StatefulWidget {
 }
 
 class _CadastroScreenState extends State<CadastroScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _nomeRestauranteController = TextEditingController();
+  final TextEditingController _latitudeController = TextEditingController();
+  final TextEditingController _longitudeController = TextEditingController();
+  final TextEditingController _culinariaController = TextEditingController();
+  final TextEditingController _nomePratoController = TextEditingController();
+  final TextEditingController _recomendacaoController = TextEditingController();
 
-  // Controladores de texto para ler o que o usuário
-  // vai digitar nos campos.
-  final TextEditingController _nomeController =
-      TextEditingController();
-
-  final TextEditingController _culinariaController =
-      TextEditingController();
-
-  // Armazena o caminho da foto no aparelho.
-  // O ? significa que pode começar como nulo.
+  int _ranking = 5;
   File? _fotoPrato;
-
-  // Variáveis para guardar as coordenadas do GPS.
-  String _latitude = '';
-  String _longitude = '';
-
-  // Instância do ImagePicker para acessar a câmera.
   final ImagePicker _picker = ImagePicker();
 
-  // ==========================================
-  // FUNÇÃO: TIRAR FOTO COM A CÂMERA
-  // ==========================================
-
-  // Função assíncrona porque precisamos esperar
-  // o usuário tirar e confirmar a foto.
-  Future<void> _tirarFoto() async {
-
-    // Abre a câmera do dispositivo.
-    final XFile? fotoCapturada =
-        await _picker.pickImage(
-          source: ImageSource.camera,
-        );
-
-    // Se o usuário tirou uma foto.
-    if (fotoCapturada != null) {
-
-      // Atualiza a tela para mostrar a foto.
-      setState(() {
-
-        // Converte o arquivo retornado pela câmera
-        // em um objeto File.
-        _fotoPrato = File(fotoCapturada.path);
-      });
-    }
+  @override
+  void dispose() {
+    _nomeRestauranteController.dispose();
+    _latitudeController.dispose();
+    _longitudeController.dispose();
+    _culinariaController.dispose();
+    _nomePratoController.dispose();
+    _recomendacaoController.dispose();
+    super.dispose();
   }
 
-  // ==========================================
-  // FUNÇÃO: SALVAR NO BANCO DE DADOS
-  // ==========================================
+  Future<void> _selecionarFoto() async {
+    final XFile? imagem = await _picker.pickImage(source: ImageSource.gallery);
+    if (imagem == null) return;
 
-  void _salvarCadastro() async {
+    setState(() {
+      _fotoPrato = File(imagem.path);
+    });
+  }
 
-    // Mapa que representa uma linha do banco.
-    //
-    // As chaves devem ser idênticas
-    // aos nomes das colunas do banco.
-    Map<String, dynamic> dadosRestaurante = {
+  Future<void> _tirarFoto() async {
+    final XFile? imagem = await _picker.pickImage(source: ImageSource.camera);
+    if (imagem == null) return;
 
-      'res_nm_restaurante': _nomeController.text,
+    setState(() {
+      _fotoPrato = File(imagem.path);
+    });
+  }
 
-      'res_ds_tipo_culinaria':
-          _culinariaController.text,
+  Future<void> _salvarCadastro() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
 
-      'res_nu_latitude':
-          _latitude,
+    if (_fotoPrato == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selecione uma foto do prato antes de salvar.'),
+          backgroundColor: Color(0xFFC92121),
+        ),
+      );
+      return;
+    }
 
-      'res_nu_longitude':
-          _longitude,
-    };
+    final String nomeRestaurante = _nomeRestauranteController.text.trim();
+    final String latitude = _latitudeController.text.trim();
+    final String longitude = _longitudeController.text.trim();
+    final String tipoCulinaria = _culinariaController.text.trim();
+    final String nomePrato = _nomePratoController.text.trim();
+    final String recomendacao = _recomendacaoController.text.trim();
 
-    // Chama a função inserirDados()
-    // informando a tabela restaurante.
-    await DatabaseHelper().inserirDados(
-      'restaurante',
-      dadosRestaurante,
+    await DatabaseHelper.instancia.cadastrarRestauranteCompleto(
+      nomeRestaurante: nomeRestaurante,
+      latitude: latitude,
+      longitude: longitude,
+      tipoCulinaria: tipoCulinaria,
+      nomePrato: nomePrato,
+      fotoPrato: _fotoPrato!.path,
+      ranking: _ranking,
+      recomendacao: recomendacao,
     );
 
-    // Caso fosse inserir o prato,
-    // o PDF mostra que seria possível usar:
-    //
-    // 'pra_im_foto': _fotoPrato!.path
+    if (!mounted) return;
 
-    // Mostra mensagem de sucesso.
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Restaurante cadastrado!'),
+      const SnackBar(
+        content: Text('Restaurante cadastrado com sucesso!'),
+        backgroundColor: Color(0xFFF1A124),
       ),
     );
 
-    // Volta para a tela anterior.
     Navigator.pop(context);
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      backgroundColor: const Color(0xFFF3F3F3),
       appBar: AppBar(
-        title: Text('Novo Cadastro'),
-        backgroundColor: Colors.orange,
+        title: const Text('Cadastro do restaurante'),
+        backgroundColor: const Color(0xFFC92121),
+        foregroundColor: Colors.white,
       ),
-
-      // SingleChildScrollView permite rolar o formulário
-      // quando o teclado aparecer.
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-
-        child: Column(
-          children: [
-
-            // Campo do nome do restaurante.
-            TextField(
-              controller: _nomeController,
-              decoration: InputDecoration(
-                labelText: 'Nome do Restaurante',
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            SizedBox(height: 15),
-
-            // ==========================================
-            // DESAFIO 2: CAMPOS FALTANTES
-            // ==========================================
-
-            // O PDF pede para adicionar:
-            // 1. Tipo de culinária
-            // 2. Nome do prato
-            // 3. Ranking (nota de 1 a 5)
-            // 4. Recomendações
-            // ==========================================
-
-            SizedBox(height: 20),
-
-            // ==========================================
-            // SEÇÃO DA CÂMERA (FOTO DO PRATO)
-            // ==========================================
-
-            Text(
-              'Foto do Prato:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-
-            SizedBox(height: 10),
-
-            Container(
-              height: 200,
-              width: double.infinity,
-
-              // Fundo cinza caso não exista foto.
-              color: Colors.grey[300],
-
-              // Se existir foto, exibe.
-              child: _fotoPrato != null
-                  ? Image.file(
-                      _fotoPrato!,
-                      fit: BoxFit.cover,
-                    )
-                  : Center(
-                      child: Text(
-                        'Nenhuma foto selecionada',
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const Text(
+                  'Informações principais',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 18),
+                _buildField(
+                  controller: _nomeRestauranteController,
+                  label: 'Nome do restaurante',
+                  icon: Icons.storefront,
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Campo obrigatório' : null,
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _buildField(
+                        controller: _latitudeController,
+                        label: 'Latitude',
+                        icon: Icons.location_on_outlined,
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value == null || value.trim().isEmpty ? 'Campo obrigatório' : null,
                       ),
                     ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildField(
+                        controller: _longitudeController,
+                        label: 'Longitude',
+                        icon: Icons.location_on_outlined,
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value == null || value.trim().isEmpty ? 'Campo obrigatório' : null,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _buildField(
+                  controller: _culinariaController,
+                  label: 'Tipo de culinária',
+                  icon: Icons.restaurant_menu,
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Campo obrigatório' : null,
+                ),
+                const SizedBox(height: 14),
+                _buildField(
+                  controller: _nomePratoController,
+                  label: 'Nome do prato',
+                  icon: Icons.fastfood,
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Campo obrigatório' : null,
+                ),
+                const SizedBox(height: 18),
+                const Text(
+                  'Foto do prato',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    color: Colors.white,
+                    border: Border.all(color: const Color(0xFFE5E5E5)),
+                  ),
+                  child: _fotoPrato != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: Image.file(
+                            _fotoPrato!,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : const Center(
+                          child: Text(
+                            'Nenhuma foto selecionada',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _selecionarFoto,
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('Galeria'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _tirarFoto,
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('Camera'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF1A124),
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const Text(
+                  'Ranking',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<int>(
+                  value: _ranking,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  items: List.generate(5, (index) => index + 1)
+                      .map(
+                        (value) => DropdownMenuItem<int>(
+                          value: value,
+                          child: Text('$value estrela${value > 1 ? 's' : ''}'),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _ranking = value);
+                    }
+                  },
+                ),
+                const SizedBox(height: 18),
+                _buildField(
+                  controller: _recomendacaoController,
+                  label: 'Recomendação do usuário',
+                  icon: Icons.comment,
+                  maxLines: 4,
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Campo obrigatório' : null,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _salvarCadastro,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFC92121),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      'Salvar restaurante',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ],
             ),
-
-            SizedBox(height: 10),
-
-            // Botão da câmera.
-            ElevatedButton.icon(
-              onPressed: _tirarFoto,
-
-              icon: Icon(Icons.camera_alt),
-
-              label: Text('Tirar Foto do Prato'),
-            ),
-
-            SizedBox(height: 30),
-          ],
+          ),
         ),
       ),
     );
   }
-}    
+
+  Widget _buildField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: const Color(0xFFC92121)),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}

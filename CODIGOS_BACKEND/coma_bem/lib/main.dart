@@ -15,8 +15,10 @@ class MyApp extends StatelessWidget {
       title: 'Coma Bem',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFC92121)),
+        scaffoldBackgroundColor: const Color(0xFFF3F3F3),
         useMaterial3: true,
+        fontFamily: 'Roboto',
       ),
       home: const SplashScreen(),
     );

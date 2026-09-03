@@ -41,7 +41,47 @@ class DatabaseHelper {
         usu_tx_senha TEXT NOT NULL
       )
     ''');
-    // As demais tabelas (restaurante, prato, avaliacao) da Atividade 4 devem ser inseridas aqui.
+
+    await db.execute('''
+      CREATE TABLE restaurante (
+        res_id_restaurante INTEGER PRIMARY KEY AUTOINCREMENT,
+        res_nm_restaurante TEXT NOT NULL,
+        res_nu_latitude TEXT NOT NULL,
+        res_nu_longitude TEXT NOT NULL,
+        res_ds_tipo_culinaria TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE prato (
+        pra_id_prato INTEGER PRIMARY KEY AUTOINCREMENT,
+        pra_nm_prato TEXT NOT NULL,
+        pra_im_foto TEXT,
+        pra_id_restaurante INTEGER NOT NULL,
+        FOREIGN KEY (pra_id_restaurante) REFERENCES restaurante(res_id_restaurante)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE avaliacao (
+        avl_id_avaliacao INTEGER PRIMARY KEY AUTOINCREMENT,
+        avl_nu_ranking INTEGER NOT NULL CHECK (avl_nu_ranking >= 1 AND avl_nu_ranking <= 5),
+        avl_tx_recomendacao TEXT NOT NULL,
+        avl_id_prato INTEGER NOT NULL,
+        avl_id_usuario INTEGER NOT NULL,
+        FOREIGN KEY (avl_id_prato) REFERENCES prato(pra_id_prato),
+        FOREIGN KEY (avl_id_usuario) REFERENCES usuario(usu_id_usuario)
+      )
+    ''');
+
+    await db.insert(
+      'usuario',
+      {
+        'usu_tx_email': 'admin@comabem.com',
+        'usu_tx_senha': 'admin123',
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
   }
 
   // ============================================================================
@@ -108,6 +148,52 @@ class DatabaseHelper {
       where: '$colunaId = ?',
       whereArgs: [id],
     );
+  }
+
+  /// Insere um novo restaurante, seu prato principal e a avaliação associada.
+  Future<int> cadastrarRestauranteCompleto({
+    required String nomeRestaurante,
+    required String latitude,
+    required String longitude,
+    required String tipoCulinaria,
+    required String nomePrato,
+    required String fotoPrato,
+    required int ranking,
+    required String recomendacao,
+    int idUsuario = 1,
+  }) async {
+    final Database db = await bancoDeDados;
+
+    final int idRestaurante = await db.insert(
+      'restaurante',
+      {
+        'res_nm_restaurante': nomeRestaurante,
+        'res_nu_latitude': latitude,
+        'res_nu_longitude': longitude,
+        'res_ds_tipo_culinaria': tipoCulinaria,
+      },
+    );
+
+    final int idPrato = await db.insert(
+      'prato',
+      {
+        'pra_nm_prato': nomePrato,
+        'pra_im_foto': fotoPrato,
+        'pra_id_restaurante': idRestaurante,
+      },
+    );
+
+    await db.insert(
+      'avaliacao',
+      {
+        'avl_nu_ranking': ranking,
+        'avl_tx_recomendacao': recomendacao,
+        'avl_id_prato': idPrato,
+        'avl_id_usuario': idUsuario,
+      },
+    );
+
+    return idRestaurante;
   }
 
   /// Insere um novo restaurante no banco de dados.
