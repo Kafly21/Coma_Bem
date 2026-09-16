@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/restaurante_model.dart';
 import 'food_review_screen.dart';
+import '../components/botao_customizado.dart';
 
 class FoodDetailScreen extends StatelessWidget {
   const FoodDetailScreen({required this.prato, super.key});
@@ -106,7 +107,8 @@ class FoodDetailScreen extends StatelessWidget {
                 color: Colors.white,
                 border: Border(top: BorderSide(color: Color(0xFFE9E9E9))),
               ),
-              child: ElevatedButton(
+              child: BotaoCustomizado(
+                texto: 'Avaliar este Prato',
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -115,18 +117,7 @@ class FoodDetailScreen extends StatelessWidget {
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF1A124),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  'Avaliar este Prato',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                ),
+                backgroundColor: const Color(0xFFF1A124),
               ),
             ),
           ],

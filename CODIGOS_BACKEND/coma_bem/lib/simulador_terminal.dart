@@ -49,7 +49,7 @@ void main() {
           id,
           nomeCliente,
           'cliente$id@email.com',
-          '123456'
+          '123456',
         );
 
         // Adicionando na lista
@@ -85,7 +85,7 @@ void main() {
           id,
           nomeAdministrador,
           'admin$id@email.com',
-          '123456'
+          '123456',
         );
 
         // Adicionando na lista
@@ -115,13 +115,13 @@ void main() {
         } else {
           for (Usuario usuario in usuariosCadastrados) {
             print('\nNome: ${usuario.nomeUsuario}');
-            
+
             // Aqui acontece o POLIMORFISMO
             usuario.exibirMenu();
           }
         }
 
-        break;    
+        break;
 
       case '4':
         sistemaRodando = false;
@@ -129,7 +129,9 @@ void main() {
         break;
 
       default:
-        print('\nOpção inválida. Por favor, tente novamente com um número de 1 a 4.');    
+        print(
+          '\nOpção inválida. Por favor, tente novamente com um número de 1 a 4.',
+        );
     }
   }
 }

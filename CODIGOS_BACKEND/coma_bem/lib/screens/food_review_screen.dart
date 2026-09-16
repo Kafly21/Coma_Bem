@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../components/botao_customizado.dart';
 
 import '../models/restaurante_model.dart';
 
@@ -209,20 +210,10 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: BotaoCustomizado(
+                    texto: 'Enviar Avaliação',
                     onPressed: _submitReview,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF1A124),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: const Text(
-                      'Enviar Avaliação',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                    ),
+                    backgroundColor: const Color(0xFFF1A124),
                   ),
                 ),
               ],
@@ -277,17 +268,10 @@ class ReviewSuccessScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: BotaoCustomizado(
+                    texto: 'Voltar ao restaurante',
                     onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF1A124),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: const Text('Voltar ao restaurante'),
+                    backgroundColor: const Color(0xFFF1A124),
                   ),
                 ),
               ],

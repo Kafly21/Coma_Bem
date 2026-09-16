@@ -74,14 +74,10 @@ class DatabaseHelper {
       )
     ''');
 
-    await db.insert(
-      'usuario',
-      {
-        'usu_tx_email': 'admin@comabem.com',
-        'usu_tx_senha': 'admin123',
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    await db.insert('usuario', {
+      'usu_tx_email': 'admin@comabem.com',
+      'usu_tx_senha': 'admin123',
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
   // ============================================================================
@@ -92,7 +88,9 @@ class DatabaseHelper {
   /// Consulta no banco de dados se o e-mail e a senha informados existem e coincidem.
   /// Retorna os dados do usuário em caso de sucesso, ou nulo se as credenciais forem inválidas.
   Future<Map<String, dynamic>?> autenticarUsuario(
-      String email, String senha) async {
+    String email,
+    String senha,
+  ) async {
     Database db = await bancoDeDados;
 
     List<Map<String, dynamic>> resultado = await db.query(
@@ -124,10 +122,11 @@ class DatabaseHelper {
   /// Atualiza os dados com base na coluna de ID (chave primária) informada.
   /// Retorna o número de linhas que foram modificadas no banco.
   Future<int> alterarDados(
-      String tabela,
-      Map<String, dynamic> novosDados,
-      String colunaId,
-      int id) async {
+    String tabela,
+    Map<String, dynamic> novosDados,
+    String colunaId,
+    int id,
+  ) async {
     Database db = await bancoDeDados;
 
     return await db.update(
@@ -143,11 +142,7 @@ class DatabaseHelper {
   /// Retorna o número de linhas excluídas.
   Future<int> deletarDados(String tabela, String colunaId, int id) async {
     Database db = await bancoDeDados;
-    return await db.delete(
-      tabela,
-      where: '$colunaId = ?',
-      whereArgs: [id],
-    );
+    return await db.delete(tabela, where: '$colunaId = ?', whereArgs: [id]);
   }
 
   /// Insere um novo restaurante, seu prato principal e a avaliação associada.
@@ -164,34 +159,25 @@ class DatabaseHelper {
   }) async {
     final Database db = await bancoDeDados;
 
-    final int idRestaurante = await db.insert(
-      'restaurante',
-      {
-        'res_nm_restaurante': nomeRestaurante,
-        'res_nu_latitude': latitude,
-        'res_nu_longitude': longitude,
-        'res_ds_tipo_culinaria': tipoCulinaria,
-      },
-    );
+    final int idRestaurante = await db.insert('restaurante', {
+      'res_nm_restaurante': nomeRestaurante,
+      'res_nu_latitude': latitude,
+      'res_nu_longitude': longitude,
+      'res_ds_tipo_culinaria': tipoCulinaria,
+    });
 
-    final int idPrato = await db.insert(
-      'prato',
-      {
-        'pra_nm_prato': nomePrato,
-        'pra_im_foto': fotoPrato,
-        'pra_id_restaurante': idRestaurante,
-      },
-    );
+    final int idPrato = await db.insert('prato', {
+      'pra_nm_prato': nomePrato,
+      'pra_im_foto': fotoPrato,
+      'pra_id_restaurante': idRestaurante,
+    });
 
-    await db.insert(
-      'avaliacao',
-      {
-        'avl_nu_ranking': ranking,
-        'avl_tx_recomendacao': recomendacao,
-        'avl_id_prato': idPrato,
-        'avl_id_usuario': idUsuario,
-      },
-    );
+    await db.insert('avaliacao', {
+      'avl_nu_ranking': ranking,
+      'avl_tx_recomendacao': recomendacao,
+      'avl_id_prato': idPrato,
+      'avl_id_usuario': idUsuario,
+    });
 
     return idRestaurante;
   }
@@ -211,8 +197,11 @@ class DatabaseHelper {
       print('Erro ao tentar cadastrar o restaurante: \$erro');
     }
   }
+
   /// Retorna uma lista de restaurantes filtrada pelo tipo de culinária (ex: 'Italiana').
-  Future<List<Map<String, dynamic>>> listarRestaurantesPorTipo(String tipo) async {
+  Future<List<Map<String, dynamic>>> listarRestaurantesPorTipo(
+    String tipo,
+  ) async {
     try {
       Database db = await bancoDeDados;
 
@@ -232,16 +221,17 @@ class DatabaseHelper {
   }
 
   /// Atualiza o ranking (nota) e o texto de recomendação de uma avaliação existente.
-  Future<void> atualizarAvaliacao(int idAvaliacao, int novaNota, String novoTexto) async {
+  Future<void> atualizarAvaliacao(
+    int idAvaliacao,
+    int novaNota,
+    String novoTexto,
+  ) async {
     try {
       Database db = await bancoDeDados;
 
       int linhasAfetadas = await db.update(
         'avaliacao',
-        {
-          'avl_nu_ranking': novaNota,
-          'avl_tx_recomendacao': novoTexto
-        },
+        {'avl_nu_ranking': novaNota, 'avl_tx_recomendacao': novoTexto},
         where: 'avl_id_avaliacao = ?', // Proteção com parâmetro
         whereArgs: [idAvaliacao],
       );
@@ -263,7 +253,8 @@ class DatabaseHelper {
 
       int linhasAfetadas = await db.delete(
         'prato',
-        where: 'pra_id_prato = ?', // Parâmetro para evitar exclusão acidental de toda a tabela
+        where:
+            'pra_id_prato = ?', // Parâmetro para evitar exclusão acidental de toda a tabela
         whereArgs: [idPrato],
       );
 
@@ -279,7 +270,8 @@ class DatabaseHelper {
 
   /// Retorna restaurantes cujo nome contenha o trecho digitado (Busca aproximada).
   Future<List<Map<String, dynamic>>> buscarRestaurantePorNome(
-      String termoBusca) async {
+    String termoBusca,
+  ) async {
     try {
       Database db = await bancoDeDados;
 
@@ -291,7 +283,8 @@ class DatabaseHelper {
       );
 
       print(
-          'Sucesso: Foram encontrados ${lista.length} restaurantes contendo "$termoBusca".');
+        'Sucesso: Foram encontrados ${lista.length} restaurantes contendo "$termoBusca".',
+      );
       return lista;
     } catch (erro) {
       // O try-catch captura o erro e impede que o aplicativo trave
@@ -302,7 +295,8 @@ class DatabaseHelper {
 
   /// Retorna todos os pratos vinculados ao ID de um restaurante específico.
   Future<List<Map<String, dynamic>>> listarPratosPorRestaurante(
-      int idRestaurante) async {
+    int idRestaurante,
+  ) async {
     try {
       Database db = await bancoDeDados;
 
@@ -313,11 +307,12 @@ class DatabaseHelper {
       );
 
       print(
-          'Sucesso: ${cardapio.length} pratos carregados para o restaurante ID $idRestaurante.');
+        'Sucesso: ${cardapio.length} pratos carregados para o restaurante ID $idRestaurante.',
+      );
       return cardapio;
     } catch (erro) {
       print('Erro ao carregar o cardápio: $erro');
       return [];
     }
-  }  
+  }
 }

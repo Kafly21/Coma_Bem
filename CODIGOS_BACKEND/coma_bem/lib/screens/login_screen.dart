@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'cadastro_screen.dart';
 import 'main_app_shell.dart';
+import '../components/botao_customizado.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -124,20 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 26),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: BotaoCustomizado(
+                      texto: 'Entrar',
                       onPressed: _submitLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF1A124),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text(
-                        'Entrar',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 14),

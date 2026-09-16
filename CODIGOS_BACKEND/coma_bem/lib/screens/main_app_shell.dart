@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/restaurante_model.dart';
 import 'home_screen.dart';
+import '../components/botao_customizado.dart';
 
 class MainAppShell extends StatefulWidget {
   const MainAppShell({super.key, this.initialIndex = 0});
@@ -183,17 +184,10 @@ class ProfileScreen extends StatelessWidget {
             const Spacer(),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: BotaoCustomizado(
+                texto: 'Sair',
                 onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF1A124),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text('Sair'),
+                backgroundColor: const Color(0xFFF1A124),
               ),
             ),
           ],

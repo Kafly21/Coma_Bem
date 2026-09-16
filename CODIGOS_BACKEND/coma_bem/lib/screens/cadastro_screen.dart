@@ -1,3 +1,6 @@
+import '../components/campo_formulario_customizado.dart';
+import '../components/botao_customizado.dart';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -48,7 +51,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
   Future<void> _tirarFoto() async {
     final XFile? imagem = await _picker.pickImage(source: ImageSource.camera);
     if (imagem == null) return;
-
+  
     setState(() {
       _fotoPrato = File(imagem.path);
     });
@@ -206,14 +209,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton.icon(
+                      child: BotaoCustomizado(
+                        texto: 'Camera',
+                        icon: Icons.camera_alt,
                         onPressed: _tirarFoto,
-                        icon: const Icon(Icons.camera_alt),
-                        label: const Text('Camera'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF1A124),
-                          foregroundColor: Colors.white,
-                        ),
                       ),
                     ),
                   ],
@@ -259,20 +258,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: BotaoCustomizado(
+                    texto: 'Salvar restaurante',
                     onPressed: _salvarCadastro,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFC92121),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: const Text(
-                      'Salvar restaurante',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                    ),
                   ),
                 ),
               ],
