@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/restaurante_model.dart';
 import 'food_detail_screen.dart';
+import '../components/network_image_with_placeholder.dart';
 
 class RestaurantDetailScreen extends StatelessWidget {
   const RestaurantDetailScreen({required this.restaurant, super.key});
@@ -27,7 +28,7 @@ class RestaurantDetailScreen extends StatelessWidget {
                       bottomLeft: Radius.circular(26),
                       bottomRight: Radius.circular(26),
                     ),
-                    child: Image.network(
+                    child: NetworkImageWithPlaceholder(
                       restaurant.bannerImage,
                       width: double.infinity,
                       height: 230,
@@ -164,7 +165,7 @@ class RestaurantDetailScreen extends StatelessWidget {
                             children: <Widget>[
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
+                                child: NetworkImageWithPlaceholder(
                                   prato.imageUrl,
                                   width: 92,
                                   height: 92,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:coma_bem/main.dart';
+import 'package:coma_bem/screens/main_app_shell.dart';
 
 void main() {
   testWidgets('busca filtra restaurantes pela pesquisa', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MaterialApp(home: MainAppShell()));
 
     await tester.pumpAndSettle();
 

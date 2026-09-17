@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../models/restaurante_model.dart';
 import 'home_screen.dart';
+import 'restaurant_detail_screen.dart';
 import '../components/botao_customizado.dart';
+import '../components/network_image_with_placeholder.dart';
 
 class MainAppShell extends StatefulWidget {
   const MainAppShell({super.key, this.initialIndex = 0});
@@ -15,13 +17,7 @@ class MainAppShell extends StatefulWidget {
 
 class _MainAppShellState extends State<MainAppShell> {
   late int _currentIndex;
-
-  final List<Widget> _screens = <Widget>[
-    const HomeScreen(),
-    const SearchScreen(),
-    const OrdersScreen(),
-    const ProfileScreen(),
-  ];
+  String? _searchQuery;
 
   @override
   void initState() {
@@ -34,7 +30,17 @@ class _MainAppShellState extends State<MainAppShell> {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: <Widget>[
+          HomeScreen(
+            onSearchRedirect: (query) => setState(() {
+              _searchQuery = query;
+              _currentIndex = 1;
+            }),
+          ),
+          SearchScreen(initialQuery: _searchQuery),
+          const OrdersScreen(),
+          const ProfileScreen(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -58,7 +64,7 @@ class _MainAppShellState extends State<MainAppShell> {
           BottomNavigationBarItem(
             icon: Icon(Icons.receipt_long_outlined),
             activeIcon: Icon(Icons.receipt_long),
-            label: 'Pedidos',
+            label: 'Opiniões Realizadas',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
@@ -71,11 +77,43 @@ class _MainAppShellState extends State<MainAppShell> {
   }
 }
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key, this.initialQuery});
+
+  final String? initialQuery;
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.text = widget.initialQuery ?? '';
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<RestauranteModel> _filter(String query) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return demoRestaurants;
+    return demoRestaurants.where((r) {
+      final text = '${r.nome} ${r.categoria} ${r.pratos.map((p) => p.nome).join(' ')}'.toLowerCase();
+      return text.contains(q);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final results = _filter(_searchController.text);
+
     return Scaffold(
       backgroundColor: const Color(0xFFC92121),
       appBar: AppBar(
@@ -84,31 +122,73 @@ class SearchScreen extends StatelessWidget {
         elevation: 0,
         title: const Text('Buscar'),
       ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.search_off_rounded, size: 72, color: Colors.white70),
-              SizedBox(height: 16),
-              Text(
-                'Nenhum resultado encontrado',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                hintText: 'Buscar restaurantes, pratos...',
+                prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                filled: true,
+                fillColor: const Color(0xFF9A1F1F),
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
-              SizedBox(height: 8),
-              Text(
-                'Tente outros termos ou outro restaurante.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, fontSize: 15),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: results.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const <Widget>[
+                          Icon(Icons.search_off_rounded, size: 56, color: Colors.white70),
+                          SizedBox(height: 8),
+                          Text('Nenhum resultado encontrado', style: TextStyle(color: Colors.white70)),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: results.length,
+                      itemBuilder: (_, index) {
+                        final r = results[index];
+                        return Card(
+                          color: Colors.white,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: NetworkImageWithPlaceholder(
+                                r.bannerImage,
+                                width: 72,
+                                height: 72,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            title: Text(r.nome, style: const TextStyle(fontWeight: FontWeight.w800)),
+                            subtitle: Text('${r.categoria} • ${r.tempoEntrega}'),
+                            trailing: Text('${r.rating}', style: const TextStyle(color: Color(0xFFF1A124), fontWeight: FontWeight.w700)),
+                            onTap: () {
+                              // navegar para detalhe — reusar a tela existente
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (_) => RestaurantDetailScreen(restaurant: r),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -123,25 +203,27 @@ class OrdersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F3F3),
       appBar: AppBar(
-        title: const Text('Pedidos'),
+        title: const Text('Opiniões Realizadas'),
         backgroundColor: const Color(0xFFC92121),
         foregroundColor: Colors.white,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: const <Widget>[
-          _OrderCard(
-            title: 'Burger Joint',
-            status: 'Em entrega',
-            items: '1x Double Bacon Burger',
+          body: ListView(
+            padding: const EdgeInsets.all(20),
+            children: const <Widget>[
+              _ReviewCard(
+                title: 'Burger Joint',
+                rating: '4.5',
+                review: 'Ótimo burger, batatas crocantes. Recomendo!',
+                date: '2026-09-10',
+              ),
+              _ReviewCard(
+                title: 'Sushi House',
+                rating: '5.0',
+                review: 'Sushi fresco e atendimento excelente.',
+                date: '2026-09-12',
+              ),
+            ],
           ),
-          _OrderCard(
-            title: 'Sushi House',
-            status: 'Entregue',
-            items: '2x Combo de sushi',
-          ),
-        ],
-      ),
     );
   }
 }
@@ -197,16 +279,18 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class _OrderCard extends StatelessWidget {
-  const _OrderCard({
+class _ReviewCard extends StatelessWidget {
+  const _ReviewCard({
     required this.title,
-    required this.status,
-    required this.items,
+    required this.rating,
+    required this.review,
+    required this.date,
   });
 
   final String title;
-  final String status;
-  final String items;
+  final String rating;
+  final String review;
+  final String date;
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +313,7 @@ class _OrderCard extends StatelessWidget {
               color: const Color(0xFFFFE3A6),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.restaurant, color: Color(0xFFC92121)),
+            child: const Icon(Icons.rate_review, color: Color(0xFFC92121)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -237,17 +321,20 @@ class _OrderCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-                const SizedBox(height: 4),
-                Text(items, style: const TextStyle(color: Colors.black54)),
+                const SizedBox(height: 6),
+                Text(review, style: const TextStyle(color: Colors.black54)),
+                const SizedBox(height: 6),
+                Text(date, style: const TextStyle(color: Colors.black38, fontSize: 12)),
               ],
             ),
           ),
-          Text(
-            status,
-            style: const TextStyle(
-              color: Color(0xFFF1A124),
-              fontWeight: FontWeight.w700,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF1D3),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Text(rating, style: const TextStyle(color: Color(0xFFC92121), fontWeight: FontWeight.w700)),
           ),
         ],
       ),

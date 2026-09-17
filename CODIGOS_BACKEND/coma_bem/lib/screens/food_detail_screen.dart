@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../components/network_image_with_placeholder.dart';
 
 import '../models/restaurante_model.dart';
 import 'food_review_screen.dart';
@@ -29,10 +30,10 @@ class FoodDetailScreen extends StatelessWidget {
                   children: <Widget>[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
+                      child: NetworkImageWithPlaceholder(
                         prato.imageUrl,
                         width: double.infinity,
-                        height: 240,
+                        height: 220,
                         fit: BoxFit.cover,
                       ),
                     ),

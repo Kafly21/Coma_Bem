@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import '../models/restaurante_model.dart';
 import 'cadastro_screen.dart';
 import 'restaurant_detail_screen.dart';
+import '../components/network_image_with_placeholder.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.onSearchRedirect});
+
+  final void Function(String)? onSearchRedirect;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -79,6 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
               TextField(
                 controller: _searchController,
                 onChanged: (_) => setState(() {}),
+                onSubmitted: (value) {
+                  final query = value.trim();
+                  if (query.isNotEmpty) {
+                    widget.onSearchRedirect?.call(query);
+                  }
+                },
                 decoration: InputDecoration(
                   hintText: 'Buscar restaurantes, pratos...',
                   prefixIcon: const Icon(Icons.search, color: Color(0xFFC92121)),
@@ -165,9 +174,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Row(
                         children: <Widget>[
+                          // use reusable network image with placeholder
                           ClipRRect(
                             borderRadius: BorderRadius.circular(14),
-                            child: Image.network(
+                            child: NetworkImageWithPlaceholder(
                               restaurant.bannerImage,
                               width: 88,
                               height: 88,

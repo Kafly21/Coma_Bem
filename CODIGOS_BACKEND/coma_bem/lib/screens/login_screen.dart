@@ -125,8 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 26),
                   SizedBox(
                     width: double.infinity,
-                    child: BotaoCustomizado(
-                      texto: 'Entrar',
+                      child: BotaoCustomizado(
+                      texto: 'Acessar',
                       onPressed: _submitLogin,
                     ),
                   ),

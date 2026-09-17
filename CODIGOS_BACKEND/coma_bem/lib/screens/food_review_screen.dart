@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import '../components/network_image_with_placeholder.dart';
 import 'package:image_picker/image_picker.dart';
 import '../components/botao_customizado.dart';
 
@@ -85,12 +86,12 @@ class _FoodReviewScreenState extends State<FoodReviewScreen> {
                     children: <Widget>[
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          widget.prato.imageUrl,
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
-                        ),
+                          child: NetworkImageWithPlaceholder(
+                            widget.prato.imageUrl,
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                          ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(

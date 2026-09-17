@@ -72,6 +72,17 @@ class _CadastroScreenState extends State<CadastroScreen> {
       return;
     }
 
+    // Validação preventiva do ranking (deve estar entre 1 e 5)
+    if (_ranking < 1 || _ranking > 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('O Ranking deve ser uma nota de 1 a 5!'),
+          backgroundColor: Color(0xFFC92121),
+        ),
+      );
+      return;
+    }
+
     final String nomeRestaurante = _nomeRestauranteController.text.trim();
     final String latitude = _latitudeController.text.trim();
     final String longitude = _longitudeController.text.trim();
@@ -79,27 +90,40 @@ class _CadastroScreenState extends State<CadastroScreen> {
     final String nomePrato = _nomePratoController.text.trim();
     final String recomendacao = _recomendacaoController.text.trim();
 
-    await DatabaseHelper.instancia.cadastrarRestauranteCompleto(
-      nomeRestaurante: nomeRestaurante,
-      latitude: latitude,
-      longitude: longitude,
-      tipoCulinaria: tipoCulinaria,
-      nomePrato: nomePrato,
-      fotoPrato: _fotoPrato!.path,
-      ranking: _ranking,
-      recomendacao: recomendacao,
-    );
+    try {
+      await DatabaseHelper.instancia.cadastrarRestauranteCompleto(
+        nomeRestaurante: nomeRestaurante,
+        latitude: latitude,
+        longitude: longitude,
+        tipoCulinaria: tipoCulinaria,
+        nomePrato: nomePrato,
+        fotoPrato: _fotoPrato!.path,
+        ranking: _ranking,
+        recomendacao: recomendacao,
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Restaurante cadastrado com sucesso!'),
-        backgroundColor: Color(0xFFF1A124),
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Restaurante cadastrado com sucesso!'),
+          backgroundColor: Color(0xFFF1A124),
+        ),
+      );
 
-    Navigator.pop(context);
+      Navigator.pop(context);
+    } catch (erro, stack) {
+      // Log detalhado para ajudarmos na depuração
+      debugPrint('DEBUG - Erro ao salvar no SQLite: $erro');
+      debugPrint('$stack');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ocorreu um erro inesperado ao salvar.'),
+          backgroundColor: Color(0xFFC92121),
+        ),
+      );
+    }
   }
 
   @override
